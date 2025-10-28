@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UNITH · Digital Human</title>
+  <link rel="icon" type="image/png" sizes="16x16" href="Favicon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="Favicon.png">
+  <meta name="description" content="UNITH landing with a digital human on the left and a reactive video/image panel on the right." />
+  <style>
+    :root{
+      --bg:#0b0f17; --fg:#e6f1ff; --muted:#9fb3c8; --brand:#7c5cff; --brand-2:#00e1d4;
+      /* shared, responsive height for both columns */
+      --panel-h: clamp(360px, 62dvh, 820px);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
+      color:var(--fg);
+      background: radial-gradient(1200px 800px at 80% 10%, rgba(124,92,255,.15), transparent 60%),
+                 radial-gradient(1000px 700px at 20% 90%, rgba(0,225,212,.12), transparent 60%), var(--bg);
+      overflow-x:hidden;
+    }
+
+    /* Top-right brandmark */
+    .brandmark-btn{
+      position:fixed; top:16px; right:16px; z-index:50;
+      display:block; border-radius:12px;
+      background:rgba(255,255,255,.1);
+      border:1px solid rgba(255,255,255,.2);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
+      padding:8px; transition: background-color .2s ease, transform .12s ease;
+    }
+    .brandmark-btn:hover{ background:rgba(255,255,255,.2); transform: translateY(-1px); }
+    .brandmark-img{ height:48px; width:48px; object-fit:contain; filter: drop-shadow(0 2px 8px rgba(0,0,0,.35)); }
+    @media (min-width: 768px){ .brandmark-img{ height:56px; width:56px; } }
+
+    /* Centered header with wordmark */
+    .hero-brand{ width:100%; padding: 48px 16px 8px; }
+    .hero-brand .inner{ max-width:1280px; margin:0 auto; padding:0 16px; text-align:center; }
+    .wordmark{
+      height:56px; width:auto; display:block; margin:0 auto;
+      filter: drop-shadow(0 2px 10px rgba(0,0,0,.35));
+    }
+    @media (min-width:768px){ .wordmark{ height:64px; } }
+
+    /* Two-column layout */
+    .hero{
+      max-width:1280px;
+      margin:24px auto 48px; padding:0 24px; display:grid; gap:24px;
+      grid-template-columns:.7fr 1.3fr;
+      align-items:stretch; /* equal card heights */
+    }
+    @media (max-width:1100px){ .hero{ grid-template-columns:.75fr 1.25fr } }
+    @media (max-width:900px){ .hero{ grid-template-columns:1fr; } }
+
+    .card{
+      position:relative;
+      background:rgba(18,24,36,.55); border:1px solid rgba(124,92,255,.2); border-radius:18px;
+      box-shadow:0 15px 60px rgba(0,0,0,.35); overflow:hidden; -webkit-backdrop-filter: blur(8px); backdrop-filter:blur(8px);
+      display:flex; flex-direction:column;
+      height: calc(var(--panel-h) + 58px); /* header (≈58px) + shared media height */
+    }
+    .pad{padding:18px 20px}
+    .pad.head{padding-bottom:8px}
+
+    /* Left: iframe matches shared height */
+    #unithFrame{
+      display:block; width:100%; height: var(--panel-h);
+      border:0; border-radius:14px; overflow:hidden
+    }
+
+    /* Right: media panel matches shared height */
+    .media-wrap{ position:relative; flex:1; }
+    .media-panel{
+      position:relative; width:100%; height: var(--panel-h);
+      background:#0f1524; border-radius:14px; overflow:hidden;
+    }
+    .media-panel video,.media-panel img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover}
+    #panelImage{opacity:0; transition:opacity .4s ease}
+
+    /* Topic buttons as overlay so card total height stays equal */
+    .btns{
+      position:absolute; left:20px; right:20px; bottom:16px; z-index:2;
+      display:flex; gap:12px; flex-wrap:wrap; justify-content:flex-start;
+    }
+    .btn{
+      appearance:none; border:0; border-radius:14px; padding:10px 14px; font-weight:600; cursor:pointer; color:#0a0a0a;
+      background:linear-gradient(135deg,var(--brand),var(--brand-2)); box-shadow:0 10px 24px rgba(124,92,255,.35); transition:transform .12s ease
+    }
+    .btn:hover{transform:translateY(-1px)}
+
+    footer{opacity:.8; text-align:center; padding:24px 16px; font-size:13px; color:#a7b3c4}
+  </style>
+</head>
+<body>
+
+  <!-- Top-right brandmark -->
+  <a target="_blank" rel="noopener noreferrer" href="https://www.unith.ai/"
+     aria-label="Go to Home"
+     class="brandmark-btn">
+    <img src="../Unith-Brandmark-4.png"
+         alt="UNITH brandmark"
+         class="brandmark-img"
+         loading="eager"
+         decoding="async"
+         draggable="false">
+  </a>
+
+  <!-- Centered UNITH wordmark -->
+  <section class="hero-brand" aria-label="UNITH">
+    <div class="inner">
+      <picture>
+        <img
+          src="../Unith-Wordmark-2.png"
+          alt="UNITH"
+          class="wordmark"
+          loading="eager"
+          decoding="async"
+        />
+      </picture>
+    </div>
+  </section>
+
+  <!-- Main section -->
+  <section class="hero" id="demo">
+    <!-- Left: digital human (same total height as right) -->
+    <div class="card">
+      <div class="pad head"><h3 style="margin:0 0 8px">Laura — Tucson Expert</h3></div>
+      <div class="pad" style="padding-top:0">
+        <iframe
+          id="unithFrame"
+          src="https://chat.unith.ai/UNITH-760/lauraes-20005?api_key=34efd4bac0624a2ab8f362efd7b3744d"
+          allow="microphone"></iframe>
+      </div>
+    </div>
+
+    <!-- Right: reactive visual panel (same total height as left) -->
+    <div class="card">
+      <div class="pad head"><h3 style="margin:0 0 8px">New Hyundai TUCSON</h3></div>
+      <div class="pad" style="padding-top:0; position:relative">
+        <div class="media-wrap">
+          <div class="media-panel" id="mediaPanel">
+            <video id="panelVideo" autoplay muted loop playsinline preload="auto"></video>
+            <img id="panelImage" alt="" />
+          </div>
+          <div class="btns">
+            <button class="btn" data-topic="exterior">Exterior</button>
+            <button class="btn" data-topic="interior">Interior</button>
+            <button class="btn" data-topic="backseats">Back seats</button>
+            <button class="btn" data-topic="wheels">Wheels</button>
+            <button class="btn" data-topic="trunk">Trunk</button>
+            <button class="btn" data-topic="ad">Ad</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>© <span id="year"></span> UNITH — Static demo.</footer>
+
+  <script>
+    // ---------- 1) Topic aliases (to accept Spanish keys) ----------
+    const aliases = {
+      anuncio: 'ad',
+      maletero: 'trunk',
+      llantas: 'wheels',
+      asientos: 'backseats',
+      traseros: 'backseats',
+      'back-seats': 'backseats'
+    };
+
+    // ---------- 2) Categories → files ----------
+    const topics = {
+      exterior:  ["tucson/exterior_tucson.avif"],
+      interior:  ["tucson/tucson_interior.jpg"],
+      backseats: ["tucson/tucson_backseats.avif"],
+      wheels:    ["tucson/tucson_llantas.jpg"],
+      trunk:     ["tucson/tucson_maletero.avif"],
+      ad:        ["tucson/ad1_tucson.mp4"]
+    };
+    const defaultTopic = "exterior";
+
+    // ---------- 3) Media panel ----------
+    const videoEl = document.getElementById('panelVideo');
+    const imgEl   = document.getElementById('panelImage');
+
+    function setPanelMedia(src){
+      const abs = new URL(src, location.href).href;
+      const isVideo = /\.(mp4|webm|ogg)(\?|$)/i.test(abs);
+      // reset video
+      videoEl.oncanplay = null; videoEl.onerror = null;
+      videoEl.removeAttribute('src'); while (videoEl.firstChild) videoEl.removeChild(videoEl.firstChild);
+
+      if (isVideo){
+        imgEl.style.opacity = 0;
+        const s = document.createElement('source'); s.src = abs; s.type = 'video/mp4'; videoEl.appendChild(s);
+        videoEl.setAttribute('playsinline',''); videoEl.setAttribute('muted','');
+        videoEl.muted = true; videoEl.loop = true; videoEl.preload = 'auto';
+        videoEl.load();
+        const tryPlay = () => videoEl.play().catch(()=>{});
+        if (videoEl.readyState >= 2) tryPlay(); else videoEl.oncanplay = tryPlay;
+      } else {
+        imgEl.src = abs; requestAnimationFrame(()=>{ imgEl.style.opacity = 1; });
+      }
+    }
+
+    function normalizeTopic(t){
+      const key = (t || '').toString().trim().toLowerCase();
+      return aliases[key] || key;
+    }
+
+    function setTopic(topic){
+      const norm = normalizeTopic(topic);
+      const list = topics[norm] || topics[defaultTopic] || [];
+      if (!list.length) return;
+      setPanelMedia(list[0]);
+    }
+
+    // ---------- 4) Local controls ----------
+    document.querySelectorAll('[data-topic]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const t = btn.getAttribute('data-topic');
+        location.hash = '#topic=' + encodeURIComponent(t);
+      });
+    });
+    function applyHashTopic(){ const m = location.hash.match(/topic=([^&]+)/); if (m) setTopic(decodeURIComponent(m[1])); }
+    addEventListener('hashchange', applyHashTopic);
+
+    // ---------- 5) Init ----------
+    document.getElementById('year').textContent = new Date().getFullYear();
+    setPanelMedia('tucson/ad1_tucson.mp4'); // default
+    applyHashTopic();
+
+    // ---------- 6) SSE Subscription ----------
+    const ROOM_ID = 'landing1';
+    const SSE_URL = 'https://sse-topic.unith.workers.dev/stream?room=' + encodeURIComponent(ROOM_ID);
+
+    (function connectSSE(){
+      try {
+        const ev = new EventSource(SSE_URL);
+        ev.onmessage = (e) => {
+          try {
+            const data = JSON.parse(e.data || '{}');
+            if (data.event === 'topic' && data.topic) setTopic(data.topic);
+          } catch(_) {}
+        };
+        ev.onerror = () => {};
+      } catch (_) {}
+    })();
+  </script>
+</body>
+</html>
